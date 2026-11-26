@@ -1,0 +1,38 @@
+name: Skill security scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  schedule:
+    - cron: "17 6 * * 1"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  skill-scanner:
+    name: Cisco AI Defense skill-scanner
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -r requirements-dev.txt
+      - name: Scan the skill
+        run: |
+          skill-scanner scan-all skill --recursive --use-behavioral --use-trigger --yara-mode strict \
+            --format sarif --output skill-scanner.sarif --fail-on-findings
+      - uses: github/codeql-action/upload-sarif@915412ff23e8b7659517e607487dbeae018f2934
+        if: always() && hashFiles('skill-scanner.sarif') != ''
+        with:
+          sarif_file: skill-scanner.sarif
+          category: skill-scanner

@@ -1,0 +1,80 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Tests (${{ matrix.os }}, Python ${{ matrix.python }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            python: "3.8"
+          - os: ubuntu-latest
+            python: "3.13"
+          - os: macos-latest
+            python: "3.13"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Unit tests
+        run: python -m unittest discover -s tests -v
+      - name: Install into a throwaway home and run the CLI
+        run: |
+          export HOME="$RUNNER_TEMP/home"
+          mkdir -p "$HOME"
+          python installer.py --agents devin,claude,codex
+          python installer.py --agents devin,claude,codex
+          "$HOME/.local/bin/dingdong" status
+          "$HOME/.local/bin/dingdong" set MODE christmas
+          echo '{"session_id":"ci","cwd":"/tmp/ci"}' | "$HOME/.local/bin/dingdong" done --agent codex
+          python - <<'PY'
+          import json, os, pathlib
+          home = pathlib.Path(os.environ["HOME"])
+          for path in (".config/devin/config.json", ".claude/settings.json", ".codex/hooks.json"):
+              hooks = json.loads((home / path).read_text())["hooks"]
+              for event, groups in hooks.items():
+                  keys = [(g.get("matcher", ""), h["command"]) for g in groups for h in g["hooks"]]
+                  assert len(keys) == len(set(keys)), (path, event, keys)
+              assert "dingdong" in hooks["Stop"][0]["hooks"][0]["command"], path
+          print("hook configs OK")
+          PY
+          python installer.py --agents devin,claude,codex --uninstall
+          test ! -e "$HOME/.local/bin/dingdong"
+      - name: macOS system Python
+        if: runner.os == 'macOS'
+        run: /usr/bin/python3 -m unittest discover -s tests
+
+  lint:
+    name: Lint and static security analysis
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@6d4fd22b20465ccc0f7354476588e8df7c9ca0e0
+        with:
+          python-version: "3.13"
+      - run: python -m pip install -r requirements-dev.txt
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: bandit -c pyproject.toml -r .

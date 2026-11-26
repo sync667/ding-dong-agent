@@ -1,0 +1,28 @@
+[project]
+name = "ding-dong-agent"
+version = "1.3.0"
+description = "Ding dong, your agent is at the door: a sound and a popup when Devin, Claude Code or Codex finishes or needs you"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.8"
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/sync667/ding-dong-agent"
+Issues = "https://github.com/sync667/ding-dong-agent/issues"
+Changelog = "https://github.com/sync667/ding-dong-agent/blob/main/CHANGELOG.md"
+
+[tool.ruff]
+line-length = 120
+target-version = "py38"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "B", "UP", "SIM", "S", "PLW"]
+ignore = ["S310", "S311", "S404", "S603", "S607", "S110", "SIM117"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101", "S108"]
+
+[tool.bandit]
+exclude_dirs = ["tests", ".venv"]
+skips = ["B310", "B311", "B404", "B603", "B607", "B110"]

@@ -1,0 +1,30 @@
+name: Bug report
+description: Something doesn't play, plays twice or breaks a hook
+labels: [bug]
+body:
+  - type: dropdown
+    id: agent
+    attributes:
+      label: Agent
+      multiple: true
+      options: [Devin, Claude Code, Codex]
+    validations:
+      required: true
+  - type: input
+    id: os
+    attributes:
+      label: OS and Python version
+      placeholder: macOS 26.2, Python 3.13
+    validations:
+      required: true
+  - type: textarea
+    id: status
+    attributes:
+      label: Output of `dingdong status`
+      render: text
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened and what you expected
+    validations:
+      required: true
