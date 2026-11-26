@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="assets/logo.png" alt="ding-dong-agent logo: a yellow bell with a terminal prompt" width="180">
+</p>
+
 # ding-dong-agent 🔔
 
 [![CI](https://github.com/sync667/ding-dong-agent/actions/workflows/ci.yml/badge.svg)](https://github.com/sync667/ding-dong-agent/actions/workflows/ci.yml)
