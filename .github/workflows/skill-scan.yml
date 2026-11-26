@@ -29,7 +29,7 @@ jobs:
       - run: python -m pip install -r requirements-dev.txt
       - name: Scan the skill
         run: |
-          skill-scanner scan-all skill --recursive --use-behavioral --use-trigger --yara-mode strict \
+          skill-scanner scan-all skill --recursive --use-behavioral --use-trigger --policy strict \
             --format sarif --output skill-scanner.sarif --fail-on-findings
       - uses: github/codeql-action/upload-sarif@915412ff23e8b7659517e607487dbeae018f2934
         if: always() && hashFiles('skill-scanner.sarif') != ''
