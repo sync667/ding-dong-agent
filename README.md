@@ -67,6 +67,31 @@ Windows isn't supported yet. PRs are welcome.
 
 ## Install
 
+Pick one of three ways. They all run the same installer and end in the same place.
+
+### Ask your agent
+
+Paste this into Devin, Claude Code or Codex:
+
+```text
+Install ding-dong-agent from https://github.com/sync667/ding-dong-agent (tag v1.3.0).
+Run its installer with --dry-run first and show me what it will change.
+After I confirm, run it for real, then run `dingdong test`.
+If Codex is installed, remind me to trust the two dingdong hooks in /hooks.
+```
+
+### One line
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/sync667/ding-dong-agent/v1.3.0/install.sh | sh -s -- --dry-run   # see what would change
+curl -fsSL https://raw.githubusercontent.com/sync667/ding-dong-agent/v1.3.0/install.sh | sh                   # install
+dingdong test                                                                                                # ding dong!
+```
+
+The script downloads release `v1.3.0` over HTTPS into a temporary folder, runs the installer from there and deletes the folder. Any option below works after `sh -s --`, for example `sh -s -- --agents claude,codex`. Prefer to read it first? [It's short](install.sh).
+
+### From a clone
+
 ```sh
 git clone https://github.com/sync667/ding-dong-agent.git
 cd ding-dong-agent
@@ -75,6 +100,8 @@ cd ding-dong-agent
 ./install.sh --dry-run               # show what would change, without touching anything
 dingdong test                        # ding dong!
 ```
+
+### What the installer does
 
 The installer does four things:
 
@@ -101,6 +128,7 @@ The installer does four things:
 
 ```sh
 ./install.sh --uninstall                                  # removes hooks, skills and the command; keeps your settings and sounds
+# no clone? curl -fsSL https://raw.githubusercontent.com/sync667/ding-dong-agent/v1.3.0/install.sh | sh -s -- --uninstall
 rm -rf ~/.config/ding-dong-agent ~/.cache/ding-dong-agent   # also delete your settings and sounds
 ```
 

@@ -8,6 +8,9 @@
   - gain is capped by each clip's peak, so it never clips;
   - this runs in the background player, so hooks stay at about 0.1 s.
 - **`dingdong levels`** shows the measured loudness and the gain used for each sound.
+- **Easier install:**
+  - one line: `curl -fsSL https://raw.githubusercontent.com/sync667/ding-dong-agent/v1.3.0/install.sh | sh`. Piped into `sh`, `install.sh` downloads the tagged release into a temporary folder, runs the installer from there and cleans up;
+  - or paste the prompt from the README into your agent and let it install for you, with a dry run first.
 
 ## 1.2.0
 

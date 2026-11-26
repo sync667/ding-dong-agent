@@ -60,6 +60,19 @@ jobs:
           PY
           python installer.py --agents devin,claude,codex --uninstall
           test ! -e "$HOME/.local/bin/dingdong"
+      - name: One-line install (piped into sh, downloads the pinned release)
+        run: |
+          version="v$(python -c 'import re; print(re.search(r"^version = \"(.+)\"", open("pyproject.toml").read(), re.M).group(1))')"
+          grep -q "^VERSION=\"$version\"$" install.sh || { echo "install.sh VERSION is not $version"; exit 1; }
+          ! grep -n "ding-dong-agent/v[0-9]" README.md | grep -v "/$version/" || { echo "README pins another version"; exit 1; }
+          export HOME="$RUNNER_TEMP/home-oneline"
+          mkdir -p "$HOME"
+          cd "$RUNNER_TEMP"
+          sh -s -- --agents claude --dry-run < "$GITHUB_WORKSPACE/install.sh"
+          sh -s -- --agents claude < "$GITHUB_WORKSPACE/install.sh"
+          "$HOME/.local/bin/dingdong" status
+          sh -s -- --agents claude --uninstall < "$GITHUB_WORKSPACE/install.sh"
+          test ! -e "$HOME/.local/bin/dingdong"
       - name: macOS system Python
         if: runner.os == 'macOS'
         run: /usr/bin/python3 -m unittest discover -s tests
