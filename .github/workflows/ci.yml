@@ -22,7 +22,8 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: ubuntu-latest
+          # ubuntu-latest (26.04) has no Python 3.8 build; 24.04 is the newest that does
+          - os: ubuntu-24.04
             python: "3.8"
           - os: ubuntu-latest
             python: "3.13"
